@@ -1,0 +1,35 @@
+# Zips the skill and attaches it to a GitHub release on every v* tag push
+name: release
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags: [ 'v*' ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # The tag must match metadata.version; that version's CHANGELOG section becomes the release notes
+      - name: Check version and collect notes
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          grep -qxF "  version: \"${VERSION}\"" skills/armarius/SKILL.md || { echo "::error::Tag ${GITHUB_REF_NAME} doesn't match metadata.version"; exit 1; }
+          awk -v v="${VERSION}" '$1 == "##" { if (on) exit; on = ($2 == v); next } on' CHANGELOG.md > notes.md
+          grep -q '[^[:space:]]' notes.md || { echo "::error::No CHANGELOG entry for ${VERSION}"; exit 1; }
+
+      # One armarius/ folder with SKILL.md on top, as claude.ai expects; LICENSE goes inside
+      - name: Package and release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir pkg && cp -R skills/armarius pkg/ && cp LICENSE pkg/armarius/
+          (cd pkg && zip -qrX ../armarius.zip armarius)
+          gh release create "${GITHUB_REF_NAME}" armarius.zip --verify-tag --title "${GITHUB_REF_NAME}" --notes-file notes.md
