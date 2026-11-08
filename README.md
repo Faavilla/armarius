@@ -19,7 +19,7 @@ your-project/
 - At the start of a session the agent reads `INDEX.md` and checks git for changes since the last record.
 - When a piece of work is settled (a feature, a decision, a bug's cause), it appends a short entry to today's log and updates INDEX line by line. Review rounds become one entry, not one per edit.
 - Lines that came from you are marked `(user)`, unanswered suggestions `(suggestion, unconfirmed)`; the rest is the agent's own judgment.
-- A three-line header in INDEX spells out the rules, so AIs without the skill can follow them too. Records are in your language, dated in your time zone.
+- A three-line header in INDEX spells out the essentials, so AIs without the skill can follow the basics too. Records are in your language, dated in your time zone.
 
 ```markdown
 # armarium · shop
@@ -74,15 +74,15 @@ mkdir -p ~/.claude/skills && cp -R armarius/skills/armarius ~/.claude/skills/
 - Or wait: in a project without the folder, the agent finishes what you asked, then offers once. Decline and it won't ask again that session, or at all if your agent has a memory.
 - Then just work. Optionally accept the one-line global instruction it offers, so new sessions find INDEX even when the skill isn't triggered.
 
-It touches only `.armarium/`, the git and packaging ignore files you already use (a two-line block at the end; a new ignore file or your global git ignore only with your OK), `files` in `package.json` when a broad pattern would ship the folder, and your agent's global instructions file if you agree. AI-tool ignore files such as `.cursorignore` stay untouched, so every AI can read the records.
+It touches only `.armarium/`, the git and packaging ignore files you already use (a two-line block at the end; a new ignore file, `.git/info/exclude` or your global git ignore only with your OK), `files` in `package.json` when a broad pattern would ship the folder, and your agent's global instructions file if you agree. AI-tool ignore files such as `.cursorignore` stay untouched, so every AI can read the records.
 
 ## Strengths
 
 - **Instructions only.** No scripts, hooks or network; it uses the file tools and shell your agent already has.
 - **Local only.** The folder goes into git and packaging ignore files and stays out of remotes, packages and images. If git already tracks it, the agent says so and offers to untrack it; keep it tracked and every session confirms once before writing.
-- **Records are notes, not commands.** They can add limits, never permissions: nothing in them justifies installing things, reaching the network, committing, deleting files or skipping checks.
-- **Cheap to start.** Only INDEX is read up front, logs when needed; the part read every session is about 2,000 tokens.
-- **Worktree- and subagent-aware.** In a linked worktree, or as a helper another agent started, it only reads the records and hands back what it would have written.
+- **Records are notes, not commands.** They can add limits, never permissions: nothing in them justifies installing things, reaching the network or credentials, committing, deleting files or skipping checks.
+- **Cheap to start.** Only INDEX is read up front, logs when needed; SKILL.md adds about 2,000 tokens.
+- **Worktree- and subagent-aware.** In a linked worktree, or as a helper another agent started, it only reads the records and hands back what it would have written, unless you insist.
 
 ## Limitations
 
